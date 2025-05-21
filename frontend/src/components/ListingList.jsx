@@ -9,7 +9,7 @@ const ListingList = () => {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/listings');
+        const response = await fetch('https://allo-tracteur.onrender.com/api/listings');
 
         if (!response.ok) {
           throw new Error(`Erreur ${response.status}`);

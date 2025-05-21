@@ -1,16 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 export default function Checkout() {
   const [amount, setAmount] = useState('');
   const [reservationId, setReservationId] = useState('');
   const [message, setMessage] = useState('');
-
+  
+  
   const handlePayment = async () => {
-    const res = await fetch('http://localhost:5000/api/payment/initiate', {
+    const res = await fetch('https://allo-tracteur.onrender.com/api/payment/initiate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount, reservationId }),
     });
+
+    const [searchParams] = useSearchParams();
+    useEffect(() => {
+      setAmount(searchParams.get('amount') || '');
+      setReservationId(searchParams.get('reservationId') || '');
+    }, []);
 
     const data = await res.json();
     if (res.ok && data.redirect_url) {

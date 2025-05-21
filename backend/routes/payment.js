@@ -16,10 +16,10 @@ const setup = new paydunya.Setup({
 const store = new paydunya.Store({
   name: 'Allô Tracteur',
   tagline: 'Location de matériel agricole',
-  phoneNumber: '22178.....',
+  phoneNumber: '221781284497',
   postalAddress: 'Dakar, Sénégal',
-  returnURL: 'http://localhost:5173/success',
-  cancelURL: 'http://localhost:5173/cancel',
+  returnURL: process.env.PAYDUNYA_RETURN_URL,
+  cancelURL: process.env.PAYDUNYA_CANCEL_URL,
 });
 
 router.post('/ipn', express.urlencoded({ extended: true }), async (req, res) => {
