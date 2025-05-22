@@ -16,8 +16,8 @@ const ListingList = () => {
 
         const data = await response.json();
         console.log("📦 Données reçues :", data);
-        setListings(data.data || []);
-        setIncluded(data.included || []);
+        setListings(data.data.data || []);
+        setIncluded(data.data.included || []);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -42,11 +42,11 @@ const ListingList = () => {
 
   return (
     <div className="relative min-h-screen">
-      {/* 🎨 Image de fond floutée 
+      {/* 🎨 Image de fond floutée */}
       <div
         className="absolute inset-0 bg-cover bg-center filter blur-sm opacity-30 z-0"
-        style={{ backgroundImage: "url('/bg-tract.jpg')" }}  
-      ></div> */}
+        style={{ backgroundImage: "url('/bg-tract.jpg')" }} // Remplace par ton image
+      ></div>
 
       {/* Contenu visible */}
       <div className="relative z-10 p-4">
@@ -73,7 +73,7 @@ const ListingList = () => {
                     <a
                       href={`https://allotracteurcom-6v0zbd.mysharetribe-test.com/l/${attributes.slug}/${id.uuid}`}
                       target="_blank"
-                      rel="noopener noreferrer" 
+                      rel="noopener noreferrer"
                       className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                     >
                       Voir l'annonce
