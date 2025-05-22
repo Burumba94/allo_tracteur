@@ -15,7 +15,8 @@ const ListingList = () => {
         }
 
         const data = await response.json();
-        setListings(data.data);
+        console.log("📦 Données reçues :", data);
+        setListings(data.data || []);
         setIncluded(data.included || []);
       } catch (err) {
         setError(err.message);
@@ -27,6 +28,7 @@ const ListingList = () => {
     fetchListings();
   }, []);
 
+  // 🔗 Trouve l’image d’un listing via son ID
   const getImageUrl = (listing) => {
     const imageRef = listing?.attributes?.relationships?.images?.data?.[0];
     if (!imageRef) return null;
@@ -40,17 +42,17 @@ const ListingList = () => {
 
   return (
     <div className="relative min-h-screen">
-      {/* Image de fond floutée */}
+      {/* 🎨 Image de fond floutée */}
       <div
         className="absolute inset-0 bg-cover bg-center filter blur-sm opacity-30 z-0"
-        style={{ backgroundImage: "url('/bg-tract.jpg')" }}
+        style={{ backgroundImage: "url('/bg-tract.jpg')" }} // Remplace par ton image
       ></div>
 
-      {/* Contenu au-dessus du fond */}
+      {/* Contenu visible */}
       <div className="relative z-10 p-4">
         <h1 className="text-3xl font-bold text-center mb-6 text-green-900">Nos Tracteurs Disponibles</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {listings.map((listing) => {
+          {Array.isArray(listings) && listings.map((listing) => {
             const { id, attributes } = listing;
             const imageUrl =
               getImageUrl(listing) || 'https://via.placeholder.com/300x200?text=Image+non+disponible';
