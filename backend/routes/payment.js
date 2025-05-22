@@ -49,7 +49,7 @@ router.post('/initiate', async (req, res) => {
       res.status(400).json({ error: invoice.response_text || 'Erreur création facture' });
     }
   } catch (error) {
-    console.error('Erreur /initiate PayDunya:', error);
+    console.error('Erreur /initiate PayDunya:', error.response?.data || error);
     res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
