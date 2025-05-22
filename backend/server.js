@@ -7,6 +7,8 @@ import express from 'express';
 import cors from 'cors';
 import sharetribeIntegrationSdk from 'sharetribe-flex-integration-sdk';
 
+import listingsRouter from './routes/listings.js'; // ✅ IMPORT du routeur listings
+
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -21,23 +23,13 @@ const sdk = sharetribeIntegrationSdk.createInstance({
 app.use(cors());
 app.use(express.json());
 
-// Route d'accueil pour test et confirmation que le backend fonctionne
+// Route d'accueil simple
 app.get('/', (req, res) => {
   res.send('✅ Backend Allô Tracteur en ligne sur Render !');
 });
 
-// Endpoint pour récupérer les annonces
-app.get('/api/listings', async (req, res) => {
-  try {
-    const response = await sdk.listings.query({ perPage: 5 });
-    res.json(response.data);
-  } catch (error) {
-    console.error('Erreur API Flex:', error.response?.data || error.message);
-    res.status(error.response?.status || 500).json({
-      error: error.response?.data || 'Erreur interne du serveur',
-    });
-  }
-});
+// ✅ Utilisation du routeur listings
+app.use(listingsRouter);
 
 // Lancement du serveur
 app.listen(port, () => {
