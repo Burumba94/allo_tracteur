@@ -1,8 +1,8 @@
-// ✅ ListingList.jsx stylisé et fonctionnel avec lien vers tunnel de paiement externe
 import React, { useEffect, useState } from 'react';
 
 const ListingList = () => {
   const [listings, setListings] = useState([]);
+  const [included, setIncluded] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -10,13 +10,13 @@ const ListingList = () => {
     const fetchListings = async () => {
       try {
         const response = await fetch('/api/listings');
-
         if (!response.ok) {
           throw new Error(`Erreur ${response.status}`);
         }
 
         const data = await response.json();
         setListings(data.data);
+        setIncluded(data.included || []);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -27,6 +27,15 @@ const ListingList = () => {
     fetchListings();
   }, []);
 
+  // 🔗 Associe une image à un listing via l'ID
+  const getImageUrl = (listing) => {
+    const imageRef = listing?.attributes?.relationships?.images?.data?.[0];
+    if (!imageRef) return null;
+
+    const image = included.find((img) => img.id.uuid === imageRef.id.uuid);
+    return image?.attributes?.variants?.default?.url || null;
+  };
+
   if (loading) return <p className="text-center mt-10">Chargement des annonces...</p>;
   if (error) return <p className="text-center text-red-600">Erreur : {error}</p>;
 
@@ -35,13 +44,18 @@ const ListingList = () => {
       <h1 className="text-3xl font-bold text-center mb-6">Nos Tracteurs Disponibles</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {listings.map((listing) => {
-          const { id, attributes, images } = listing;
-          const imageUrl = images?.length ? images[0].attributes.variants.default.url : 'https://via.placeholder.com/300x200?text=Image+Non+disponible';
+          const { id, attributes } = listing;
+          const imageUrl =
+            getImageUrl(listing) || 'https://via.placeholder.com/300x200?text=Image+non+disponible';
           const amount = attributes.price?.amount || 0;
 
           return (
             <div key={id.uuid} className="bg-white rounded-xl shadow-md overflow-hidden">
-              <img src={imageUrl} alt={attributes.title} className="w-full h-48 object-cover" />
+              <img
+                src={imageUrl}
+                alt={attributes.title}
+                className="w-full h-48 object-cover"
+              />
               <div className="p-4">
                 <h2 className="text-xl font-bold mb-2">{attributes.title}</h2>
                 <p className="text-gray-600 mb-1">{attributes.description}</p>
