@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 });
 
 // Utilisation du routeur listings
-app.use(listingsRouter);
+app.use('/api/listings', listingsRouter);
 app.use('/api/payment', paymentRouter);
 
 // Lancement du serveur

@@ -26,10 +26,13 @@ router.post('/initiate', async (req, res) => {
   const { amount, reservationId } = req.body;
 
   try {
+    const parsedAmount = parseInt(amount, 10);
+    const unitPrice = parsedAmount / 100;
+    
     const invoice = new paydunya.CheckoutInvoice(setup, store);
 
-    invoice.addItem('Réservation tracteur', 1, amount / 100, amount / 100); // PayDunya attend des montants en FCFA
-    invoice.totalAmount = amount / 100;
+    invoice.addItem('Réservation tracteur', 1, unitPrice, unitPrice); // PayDunya attend des montants en FCFA
+    invoice.totalAmount = unitPrice;
     invoice.description = `Réservation ID ${reservationId}`;
 
     invoice.customData = { reservationId };
