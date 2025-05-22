@@ -73,7 +73,7 @@ const ListingList = () => {
                     <a
                       href={`https://allotracteurcom-6v0zbd.mysharetribe-test.com/l/${attributes.slug}/${id.uuid}`}
                       target="_blank"
-                      rel="noopener noreferrer"
+                      rel="noopener noreferrer" 
                       className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                     >
                       Voir l'annonce
