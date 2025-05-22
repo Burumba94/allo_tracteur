@@ -4,7 +4,7 @@ import sdk from '../utils/sdk.js';
 
 const router = express.Router();
 
-router.get('/api/listings/query', async (req, res) => {
+router.get('/query', async (req, res) => {
   try {
     const response = await sdk.listings.query({ perPage: 5, include: ['images'] });
     res.json({
