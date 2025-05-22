@@ -6,8 +6,8 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import sharetribeIntegrationSdk from 'sharetribe-flex-integration-sdk';
-
-import listingsRouter from './routes/listings.js'; // ✅ IMPORT du routeur listings
+import paymentRouter from './routes/payment.js'; // import du routeur paiement
+import listingsRouter from './routes/listings.js'; // IMPORT du routeur listings
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -28,8 +28,9 @@ app.get('/', (req, res) => {
   res.send('✅ Backend Allô Tracteur en ligne sur Render !');
 });
 
-// ✅ Utilisation du routeur listings
+// Utilisation du routeur listings
 app.use(listingsRouter);
+app.use('/api/payment', paymentRouter);
 
 // Lancement du serveur
 app.listen(port, () => {
