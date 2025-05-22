@@ -13,9 +13,6 @@ const ListingList = () => {
         if (!response.ok) throw new Error(`Erreur ${response.status}`);
         const data = await response.json();
 
-        // 🔍 Vérification de la forme attendue
-        console.log('Réponse API listings:', data);
-
         setListings(Array.isArray(data.data) ? data.data : []);
         setIncluded(Array.isArray(data.included) ? data.included : []);
       } catch (err) {
