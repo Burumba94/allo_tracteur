@@ -42,11 +42,11 @@ const ListingList = () => {
 
   return (
     <div className="relative min-h-screen">
-      {/* 🎨 Image de fond floutée */}
+      {/* 🎨 Image de fond floutée 
       <div
         className="absolute inset-0 bg-cover bg-center filter blur-sm opacity-30 z-0"
-        style={{ backgroundImage: "url('/bg-tract.jpg')" }} // Remplace par ton image
-      ></div>
+        style={{ backgroundImage: "url('/bg-tract.jpg')" }}  
+      ></div> */}
 
       {/* Contenu visible */}
       <div className="relative z-10 p-4">
