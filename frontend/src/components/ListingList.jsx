@@ -12,8 +12,12 @@ const ListingList = () => {
         const response = await fetch('/api/listings/query');
         if (!response.ok) throw new Error(`Erreur ${response.status}`);
         const data = await response.json();
-        setListings(data.data);
-        setIncluded(data.included || []);
+
+        // 🔍 Vérification de la forme attendue
+        console.log('Réponse API listings:', data);
+
+        setListings(Array.isArray(data.data) ? data.data : []);
+        setIncluded(Array.isArray(data.included) ? data.included : []);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -27,6 +31,7 @@ const ListingList = () => {
   const getImageUrl = (listing) => {
     const imageRef = listing?.attributes?.relationships?.images?.data?.[0];
     if (!imageRef) return null;
+
     const image = included.find((img) => img.id.uuid === imageRef.id.uuid);
     return image?.attributes?.variants?.default?.url || null;
   };
@@ -40,7 +45,8 @@ const ListingList = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {listings.map((listing) => {
           const { id, attributes } = listing;
-          const imageUrl = getImageUrl(listing) || 'https://via.placeholder.com/300x200?text=Image+non+disponible';
+          const imageUrl =
+            getImageUrl(listing) || 'https://via.placeholder.com/300x200?text=Image+non+disponible';
           const amount = attributes.price?.amount || 0;
 
           return (
