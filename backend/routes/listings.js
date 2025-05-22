@@ -1,6 +1,6 @@
 // backend/routes/listings.js
 import express from 'express';
-import sdk from '../utils/sdk';
+import sdk from '../utils/sdk.js';
 
 const router = express.Router();
 
