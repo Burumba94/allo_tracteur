@@ -14,7 +14,7 @@ export default function Checkout() {
 
   const handlePayment = async () => {
     try {
-      const res = await fetch('/api/payment/initiate', {
+      const res = await fetch('https://allo-tracteur.onrender.com/api/payment/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount, reservationId }),
