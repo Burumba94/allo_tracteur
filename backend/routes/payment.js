@@ -17,7 +17,7 @@ const store = new paydunya.Store({
   tagline: 'Location de matériel agricole',
   phoneNumber: '221781284497',
   postalAddress: 'Dakar, Sénégal',
-  returnURL: process.env.PAYDUNYA_RETURN_URL,
+  returnURL: process.env.PAYDUNYA_RETURN_URL, 
   cancelURL: process.env.PAYDUNYA_CANCEL_URL,
 });
 
@@ -27,7 +27,7 @@ router.post('/initiate', async (req, res) => {
 
   try {
     const parsedAmount = parseInt(amount, 10);
-    const unitPrice = parsedAmount / 100;
+    const unitPrice = parsedAmount;
     
     const invoice = new paydunya.CheckoutInvoice(setup, store);
 
@@ -44,7 +44,7 @@ router.post('/initiate', async (req, res) => {
     const success = await invoice.create();
 
     if (success) {
-      res.status(200).json({ redirect_url: invoice.url }); // ✅ BON champ pour redirection
+      res.status(200).json({ redirect_url: invoice.url }); //  BON champ pour redirection
     } else {
       res.status(400).json({ error: invoice.response_text || 'Erreur création facture' });
     }
