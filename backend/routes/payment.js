@@ -21,17 +21,22 @@ const store = new paydunya.Store({
   cancelURL: process.env.PAYDUNYA_CANCEL_URL,
 });
 
-// ✅ ROUTE POUR INITIER LE PAIEMENT
+// ROUTE POUR INITIER LE PAIEMENT
 router.post('/initiate', async (req, res) => {
   const { amount, reservationId } = req.body;
 
   try {
-    const parsedAmount = parseInt(amount, 10);
-    const unitPrice = parsedAmount / 100;
-    
-    const invoice = new paydunya.CheckoutInvoice(setup, store);
+    // Validation des données reçues
+    if (!amount || !reservationId || isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ error: 'Montant ou ID réservation invalide' });
+    }
 
-    invoice.addItem('Réservation tracteur', 1, unitPrice, unitPrice); // PayDunya attend des montants en FCFA
+    // Le montant envoyé est déjà en FCFA, donc pas besoin de division par 100
+    const unitPrice = parseFloat(amount);
+
+    // Création de la facture PayDunya
+    const invoice = new paydunya.CheckoutInvoice(setup, store);
+    invoice.addItem('Réservation tracteur', 1, unitPrice, unitPrice); // Le montant est déjà en FCFA
     invoice.totalAmount = unitPrice;
     invoice.description = `Réservation ID ${reservationId}`;
 
@@ -41,10 +46,11 @@ router.post('/initiate', async (req, res) => {
     invoice.returnURL = process.env.PAYDUNYA_RETURN_URL;
     invoice.cancelURL = process.env.PAYDUNYA_CANCEL_URL;
 
+    // Création de la facture
     const success = await invoice.create();
 
     if (success) {
-      res.status(200).json({ redirect_url: invoice.url }); //  BON champ pour redirection
+      res.status(200).json({ redirect_url: invoice.url }); // Redirection vers le paiement
     } else {
       res.status(400).json({ error: invoice.response_text || 'Erreur création facture' });
     }
@@ -54,7 +60,7 @@ router.post('/initiate', async (req, res) => {
   }
 });
 
-// ✅ ROUTE IPN POUR RECEVOIR LA CONFIRMATION DE PAYDUNYA
+// ROUTE IPN POUR RECEVOIR LA CONFIRMATION DE PAYDUNYA
 router.post('/ipn', express.urlencoded({ extended: true }), async (req, res) => {
   const { data, hash } = req.body;
 
@@ -64,10 +70,12 @@ router.post('/ipn', express.urlencoded({ extended: true }), async (req, res) => 
       .update(process.env.PAYDUNYA_MASTER_KEY)
       .digest('hex');
 
+    // Vérification du hash pour assurer la sécurité
     if (hash !== expectedHash) {
       return res.status(400).json({ message: 'Hash invalide' });
     }
 
+    // Confirmer le paiement de la facture
     const invoice = new paydunya.CheckoutInvoice(setup, store);
     await invoice.confirm(data.token);
 
