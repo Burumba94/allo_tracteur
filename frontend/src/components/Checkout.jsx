@@ -8,18 +8,17 @@ export default function Checkout() {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const fetchedAmount = searchParams.get('amount');
-    const fetchedReservationId = searchParams.get('reservationId');
+    const initialAmount = searchParams.get('amount');
+    const initialReservationId = searchParams.get('reservationId');
 
-    console.log('Montant récupéré :', fetchedAmount);
-    console.log('ID Réservation récupéré :', fetchedReservationId);
+    if (initialAmount && !amount) setAmount(initialAmount);
+    if (initialReservationId && !reservationId) setReservationId(initialReservationId);
 
-    setAmount(fetchedAmount || '');
-    setReservationId(fetchedReservationId || '');
-  }, []);
+    console.log('Montant récupéré depuis l’URL :', initialAmount);
+    console.log('ID Réservation depuis l’URL :', initialReservationId);
+  }, []); // Ne s’exécute qu’une seule fois au chargement
 
   const handlePayment = async () => {
-    // Validation des champs
     if (!amount || !reservationId) {
       setMessage('Veuillez remplir tous les champs.');
       return;
@@ -31,12 +30,20 @@ export default function Checkout() {
       return;
     }
 
+    if (numericAmount > 3000000) {
+      setMessage('Le montant maximum autorisé est de 3 000 000 FCFA.');
+      return;
+    }
+
     try {
+      console.log('Montant envoyé à l’API :', numericAmount);
+      console.log('ReservationId envoyé à l’API :', reservationId);
+
       const res = await fetch('https://allo-tracteur.onrender.com/api/payment/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: numericAmount, // ← On envoie bien le montant en FCFA
+          amount: numericAmount,
           reservationId,
         }),
       });
@@ -69,7 +76,9 @@ export default function Checkout() {
           placeholder="Montant en FCFA"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
+          max="3000000"
         />
+
         <input
           className="border border-green-300 p-2 w-full rounded mb-4"
           type="text"
@@ -77,6 +86,7 @@ export default function Checkout() {
           value={reservationId}
           onChange={(e) => setReservationId(e.target.value)}
         />
+
         <button
           onClick={handlePayment}
           className="bg-green-600 w-full py-2 text-white rounded hover:bg-green-700 transition"
