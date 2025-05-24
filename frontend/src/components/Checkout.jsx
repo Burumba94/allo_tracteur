@@ -16,7 +16,7 @@ export default function Checkout() {
 
     setAmount(fetchedAmount || '');
     setReservationId(fetchedReservationId || '');
-  }, [searchParams]);
+  }, []);
 
   const handlePayment = async () => {
     // Validation des champs
