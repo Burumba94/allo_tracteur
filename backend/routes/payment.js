@@ -27,7 +27,7 @@ router.post('/initiate', async (req, res) => {
 
   try {
     const parsedAmount = parseInt(amount, 10);
-    const unitPrice = parsedAmount;
+    const unitPrice = parsedAmount / 100;
     
     const invoice = new paydunya.CheckoutInvoice(setup, store);
 
