@@ -22,30 +22,34 @@ const store = new paydunya.Store({
   cancelURL: process.env.PAYDUNYA_CANCEL_URL,
 });
 
-// === ROUTE POUR INITIER LE PAIEMENT ===
+// INITIER LE PAIEMENT
 router.post('/initiate', async (req, res) => {
   const { amount, reservationId } = req.body;
 
-  try {
-    const numericAmount = parseFloat(amount);
+  console.log('📩 Données reçues :', { amount, reservationId });
 
-    // ✅ Validation des données
-    if (!reservationId || isNaN(numericAmount) || numericAmount <= 0) {
+  try {
+    // Validation des données
+    if (!amount || !reservationId || isNaN(amount) || amount <= 0) {
       return res.status(400).json({ error: 'Montant ou ID réservation invalide' });
     }
 
-    if (numericAmount > 3000000) {
-      return res.status(400).json({ error: 'Le montant ne doit pas dépasser 3 000 000 FCFA' });
+    if (amount > 3000000) {
+      return res.status(400).json({ error: 'Le montant maximum autorisé est 3 000 000 FCFA.' });
     }
 
-    // ✅ Création de la facture
+    const unitPrice = parseFloat(amount);
+
+    if (isNaN(unitPrice) || typeof unitPrice !== 'number') {
+      return res.status(400).json({ error: 'Montant non numérique ou invalide' });
+    }
+
     const invoice = new paydunya.CheckoutInvoice(setup, store);
-
-    invoice.addItem('Réservation tracteur', 1, numericAmount, numericAmount);
-    invoice.totalAmount = numericAmount;
+    invoice.addItem('Réservation tracteur', 1, unitPrice, unitPrice);
+    invoice.totalAmount = unitPrice;
     invoice.description = `Réservation ID ${reservationId}`;
-    invoice.customData = { reservationId };
 
+    invoice.customData = { reservationId };
     invoice.callbackURL = process.env.PAYDUNYA_IPN_URL;
     invoice.returnURL = process.env.PAYDUNYA_RETURN_URL;
     invoice.cancelURL = process.env.PAYDUNYA_CANCEL_URL;
@@ -53,19 +57,27 @@ router.post('/initiate', async (req, res) => {
     const success = await invoice.create();
 
     if (success) {
-      return res.status(200).json({ redirect_url: invoice.url });
+      console.log(' Facture créée avec succès. Redirection vers :', invoice.url);
+      res.status(200).json({ redirect_url: invoice.url });
     } else {
-      console.error('Échec de création de facture :', invoice.response_text);
-      return res.status(400).json({ error: invoice.response_text || 'Erreur création facture' });
+      console.error(' Échec création facture PayDunya :', {
+        response_code: invoice.response_code,
+        response_text: invoice.response_text,
+        response: invoice.response,
+      });
+      res.status(400).json({
+        error: invoice.response_text || 'Erreur création facture',
+        code: invoice.response_code,
+        raw: invoice.response,
+      });
     }
-
   } catch (error) {
-    console.error('Erreur /initiate PayDunya:', error.response?.data || error.message || error);
-    return res.status(500).json({ error: 'Erreur interne du serveur' });
+    console.error(' Erreur /initiate PayDunya :', error.response?.data || error);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
-// === ROUTE IPN POUR CONFIRMATION DE PAYDUNYA ===
+// IPN : Confirmation de paiement par PayDunya
 router.post('/ipn', express.urlencoded({ extended: true }), async (req, res) => {
   const { data, hash } = req.body;
 
@@ -76,6 +88,7 @@ router.post('/ipn', express.urlencoded({ extended: true }), async (req, res) => 
       .digest('hex');
 
     if (hash !== expectedHash) {
+      console.warn(' IPN reçu avec hash invalide');
       return res.status(400).json({ message: 'Hash invalide' });
     }
 
@@ -83,15 +96,16 @@ router.post('/ipn', express.urlencoded({ extended: true }), async (req, res) => 
     await invoice.confirm(data.token);
 
     if (invoice.status === 'completed') {
-      // TODO: Mettre à jour la réservation dans ta base de données ici
-      return res.status(200).json({ message: 'Paiement confirmé' });
+      // Mettre à jour ta BDD ici si besoin
+      console.log(' Paiement confirmé pour réservation ID :', invoice.customData?.reservationId);
+      res.status(200).json({ message: 'Paiement confirmé' });
     } else {
-      return res.status(200).json({ message: 'Paiement non complété' });
+      console.warn(' Paiement non complété pour :', invoice.customData?.reservationId);
+      res.status(200).json({ message: 'Paiement non complété' });
     }
-
   } catch (error) {
-    console.error('Erreur IPN PayDunya:', error.message || error);
-    return res.status(500).json({ message: 'Erreur serveur IPN' });
+    console.error(' Erreur IPN PayDunya :', error);
+    res.status(500).json({ message: 'Erreur serveur IPN' });
   }
 });
 

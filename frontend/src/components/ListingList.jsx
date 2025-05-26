@@ -10,12 +10,11 @@ const ListingList = () => {
     const fetchListings = async () => {
       try {
         const response = await fetch('/api/listings/query');
-        if (!response.ok) {
-          throw new Error(`Erreur ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Erreur ${response.status}`);
 
         const data = await response.json();
         console.log("📦 Données reçues :", data);
+
         setListings(data.data.data || []);
         setIncluded(data.data.included || []);
       } catch (err) {
@@ -28,12 +27,17 @@ const ListingList = () => {
     fetchListings();
   }, []);
 
-  // 🔗 Trouve l’image d’un listing via son ID
+  // ✅ Fonction corrigée pour extraire l'URL de l'image
   const getImageUrl = (listing) => {
-    const imageRef = listing?.attributes?.relationships?.images?.data?.[0];
+    const imageRef = listing?.relationships?.images?.data?.[0];
     if (!imageRef) return null;
 
-    const image = included.find((img) => img.id.uuid === imageRef.id.uuid);
+    const image = included.find(
+      (img) =>
+        img.type === 'image' &&
+        (img.id?.uuid === imageRef.id?.uuid || img.id === imageRef.id)
+    );
+
     return image?.attributes?.variants?.default?.url || null;
   };
 
@@ -45,14 +49,17 @@ const ListingList = () => {
       {/* 🎨 Image de fond floutée */}
       <div
         className="absolute inset-0 bg-cover bg-center filter blur-sm opacity-30 z-0"
-        style={{ backgroundImage: "url('/bg-tract.jpg')" }} // Remplace par ton image
+        style={{ backgroundImage: "url('/bg-tract.jpg')" }}
       ></div>
 
       {/* Contenu visible */}
       <div className="relative z-10 p-4">
-        <h1 className="text-3xl font-bold text-center mb-6 text-green-900">Nos Tracteurs Disponibles</h1>
+        <h1 className="text-3xl font-bold text-center mb-6 text-green-900">
+          Nos Tracteurs Disponibles
+        </h1>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {Array.isArray(listings) && listings.map((listing) => {
+          {listings.map((listing) => {
             const { id, attributes } = listing;
             const imageUrl =
               getImageUrl(listing) || 'https://via.placeholder.com/300x200?text=Image+non+disponible';
@@ -69,6 +76,7 @@ const ListingList = () => {
                   <h2 className="text-xl font-bold mb-2">{attributes.title}</h2>
                   <p className="text-gray-600 mb-1">{attributes.description}</p>
                   <p className="text-green-600 font-semibold mb-3">{amount / 100} F CFA</p>
+
                   <div className="flex justify-between">
                     <a
                       href={`https://allotracteurcom-6v0zbd.mysharetribe-test.com/l/${attributes.slug}/${id.uuid}`}
