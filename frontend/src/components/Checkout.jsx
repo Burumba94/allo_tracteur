@@ -35,7 +35,7 @@ export default function Checkout() {
       return;
     }
 
-    const amountInCents = numericAmount * 100;
+    const amountInCents = numericAmount;
 
     try {
       console.log('Montant envoyé à l’API :', numericAmount);
