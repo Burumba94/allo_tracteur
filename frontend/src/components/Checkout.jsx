@@ -35,6 +35,8 @@ export default function Checkout() {
       return;
     }
 
+    const amountInCents = numericAmount * 100;
+
     try {
       console.log('Montant envoyé à l’API :', numericAmount);
       console.log('ReservationId envoyé à l’API :', reservationId);
@@ -43,7 +45,7 @@ export default function Checkout() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: numericAmount,
+          amount: amountInCents,
           reservationId,
         }),
       });

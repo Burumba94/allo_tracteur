@@ -17,7 +17,7 @@ const store = new paydunya.Store({
   tagline: 'Location de matériel agricole',
   phoneNumber: '221781284497',
   postalAddress: 'Dakar, Sénégal',
-  returnURL: process.env.PAYDUNYA_RETURN_URL, 
+  returnURL: process.env.PAYDUNYA_RETURN_URL,
   cancelURL: process.env.PAYDUNYA_CANCEL_URL,
 });
 
@@ -37,30 +37,38 @@ router.post('/initiate', async (req, res) => {
     invoice.totalAmount = unitPrice;
     invoice.description = `Réservation ID ${reservationId}`;
     invoice.customData = { reservationId };
+
     invoice.callbackURL = process.env.PAYDUNYA_IPN_URL;
     invoice.returnURL = process.env.PAYDUNYA_RETURN_URL;
     invoice.cancelURL = process.env.PAYDUNYA_CANCEL_URL;
 
-    const success = await invoice.create();
+    let success;
+    try {
+      success = await invoice.create();
+    } catch (createErr) {
+      console.error('Erreur exception lors création facture PayDunya:', createErr);
+      return res.status(500).json({ error: 'Erreur lors de la création de la facture PayDunya.' });
+    }
 
     if (success) {
       return res.status(200).json({ redirect_url: invoice.url });
     } else {
-      // Log complet de la réponse PayDunya pour debug
       console.error('Échec création facture PayDunya :', invoice.response);
-
+      if (!invoice.response) {
+        console.error('Invoice complet pour debug :', JSON.stringify(invoice, null, 2));
+      }
       return res.status(400).json({
         error: invoice.response_text || 'Erreur création facture',
-        response: invoice.response, // envoi la réponse brute pour debug si besoin
+        response: invoice.response || null,
       });
     }
   } catch (error) {
     console.error('Erreur /initiate PayDunya:', error.response?.data || error);
-    return res.status(500).json({ error: 'Erreur interne du serveur' });
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
-// ROUTE IPN POUR CONFIRMATION DE PAIEMENT (inchangée)
+// ROUTE IPN POUR RECEVOIR LA CONFIRMATION DE PAYDUNYA
 router.post('/ipn', express.urlencoded({ extended: true }), async (req, res) => {
   const { data, hash } = req.body;
 
