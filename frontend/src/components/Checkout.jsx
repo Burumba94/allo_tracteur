@@ -11,12 +11,12 @@ export default function Checkout() {
     const initialAmount = searchParams.get('amount');
     const initialReservationId = searchParams.get('reservationId');
 
-    if (initialAmount && !amount) setAmount(initialAmount);
-    if (initialReservationId && !reservationId) setReservationId(initialReservationId);
+    if (initialAmount) setAmount(initialAmount);
+    if (initialReservationId) setReservationId(initialReservationId);
 
     console.log('Montant récupéré depuis l’URL :', initialAmount);
     console.log('ID Réservation depuis l’URL :', initialReservationId);
-  }, []); // Ne s’exécute qu’une seule fois au chargement
+  }, []);
 
   const handlePayment = async () => {
     if (!amount || !reservationId) {
@@ -24,28 +24,23 @@ export default function Checkout() {
       return;
     }
 
-    const numericAmount = parseFloat(amount);
+    const numericAmount = parseInt(amount); // <-- En centimes
     if (isNaN(numericAmount) || numericAmount <= 0) {
       setMessage('Le montant est invalide.');
       return;
     }
 
-    if (numericAmount > 3000000) {
+    if (numericAmount > 3000000 * 100) {
       setMessage('Le montant maximum autorisé est de 3 000 000 FCFA.');
       return;
     }
 
-    const amountInCents = numericAmount;
-
     try {
-      console.log('Montant envoyé à l’API :', numericAmount);
-      console.log('ReservationId envoyé à l’API :', reservationId);
-
       const res = await fetch('https://allo-tracteur.onrender.com/api/payment/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: amountInCents,
+          amount: numericAmount,
           reservationId,
         }),
       });
@@ -76,9 +71,8 @@ export default function Checkout() {
           className="border border-green-300 p-2 w-full rounded mb-3"
           type="number"
           placeholder="Montant en FCFA"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          max="3000000"
+          value={amount / 100}
+          onChange={(e) => setAmount(e.target.value * 100)}
         />
 
         <input
