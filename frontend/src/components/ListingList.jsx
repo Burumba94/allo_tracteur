@@ -87,7 +87,7 @@ const ListingList = () => {
                       Voir l'annonce
                     </a>
                     <a
-                      href={`https://allo-tracteur.vercel.app/checkout?reservationId=${id.uuid}&amount=${amount / 100}`}
+                      href={`https://allo-tracteur.vercel.app/checkout?reservationId=${id.uuid}&amount=${amount}`}
                       className="text-white bg-green-600 hover:bg-green-700 text-sm px-3 py-1 rounded"
                     >
                       Réserver
