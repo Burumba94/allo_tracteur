@@ -18,12 +18,33 @@ const sdk = createInstance({
   baseUrl,
 });
 
+// 🔄 Route pour déclencher une transition Flex (appelée depuis l’IPN)
+router.post('/api/flex/transition', async (req, res) => {
+  const { transactionId, transition } = req.body;
+
+  if (!transactionId || !transition) {
+    return res.status(400).json({ error: 'transactionId et transition sont requis.' });
+  }
+
+  try {
+    const response = await sdk.transactions.transition({
+      id: transactionId,
+      transition: transition,
+      params: {},
+    });
+
+    res.status(200).json({ message: 'Transition effectuée avec succès', result: response.data });
+  } catch (error) {
+    console.error('❌ Erreur transition Flex :', error.response?.data || error.message);
+    res.status(500).json({ error: 'Erreur lors de la transition Flex', detail: error.response?.data });
+  }
+});
+
+// Exemple route listing (inchangée)
 router.get('/api/listings/query', async (req, res) => {
   try {
-    const response = await sdk.listings.query({
-      perPage: 5,
-    });
-    if (response.data && response.data.data) {
+    const response = await sdk.listings.query({ perPage: 5 });
+    if (response.data?.data) {
       res.json(response.data.data);
     } else {
       res.status(404).json({ error: 'Aucune annonce trouvée' });

@@ -1,0 +1,77 @@
+{:format :v3
+ :transitions
+ [
+  ;; 1. Inquire
+  {:name :transition/inquire
+   :actor :actor.role/customer
+   :actions [{:name :action/update-protected-data}]
+   :to :state/inquiry}
+
+  ;; 2. Demande de réservation → frontend redirige vers PayDunya (pas Stripe)
+  ;; Ajout de protectedData pour indiquer paiement en attente
+  {:name :transition/request-payment
+   :actor :actor.role/customer
+   :actions [
+     {:name :action/update-protected-data
+      :config {:paymentStatus "pending"
+               :paymentMethod "mobile_money"}}
+     {:name :action/create-pending-booking, :config {:type :time}}
+     {:name :action/privileged-set-line-items}
+   ]
+   :to :state/pending-payment
+   :privileged? true}
+
+  ;; 3. Confirmation externe du paiement via PayDunya
+  ;; À faire côté backend : appel API pour déclencher cette transition avec update de protectedData
+  {:name :transition/external-payment
+   :actor :actor.role/operator
+   :actions [
+     {:name :action/update-protected-data} ;; backend injecte paiement confirmé et autres infos
+   ]
+   :from :state/pending-payment
+   :to :state/preauthorized}
+
+  ;; 4. Acceptation par le fournisseur
+  {:name :transition/accept
+   :actor :actor.role/provider
+   :actions [{:name :action/accept-booking}]
+   :from :state/preauthorized
+   :to :state/accepted}
+
+  ;; 5. Annulation
+  {:name :transition/cancel
+   :actor :actor.role/operator
+   :actions [{:name :action/cancel-booking}]
+   :from :state/accepted
+   :to :state/cancelled}
+
+  ;; 6. Complétion
+  {:name :transition/complete
+   :actor :actor.role/operator
+   :actions []
+   :from :state/accepted
+   :to :state/delivered}
+
+  ;; 7. Revue par le client
+  {:name :transition/review-1-by-customer
+   :actor :actor.role/customer
+   :actions [{:name :action/post-review-by-customer}]
+   :from :state/delivered
+   :to :state/reviewed-by-customer}
+
+  ;; 8. Revue par le fournisseur
+  {:name :transition/review-2-by-provider
+   :actor :actor.role/provider
+   :actions [
+     {:name :action/post-review-by-provider}
+     {:name :action/publish-reviews}]
+   :from :state/reviewed-by-customer
+   :to :state/reviewed}
+ ]
+ :notifications
+ [
+  ;;{:name :notification/booking-new-request
+  ;; :on :transition/external-payment
+  ;; :to :actor.role/provider
+  ;; :template :booking-new-request}
+ ]}
