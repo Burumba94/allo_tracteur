@@ -36,6 +36,13 @@ router.post('/initiate', async (req, res) => {
       return res.status(400).json({ error: 'Montant trop élevé. Maximum autorisé : 3 000 000 FCFA.' });
     }
 
+    console.log('PAYDUNYA config:', {
+      masterKey: process.env.PAYDUNYA_MASTER_KEY,
+      privateKey:process.env.PAYDUNYA_PRIVATE_KEY,
+      publicKey: process.env.PAYDUNYA_PUBLIC_KEY,
+      token: process.env.PAYDUNYA_TOKEN,
+    });
+
     const invoice = new paydunya.CheckoutInvoice(setup, store);
 
     invoice.addItem('Réservation tracteur', 1, unitPrice, unitPrice);
@@ -52,7 +59,7 @@ router.post('/initiate', async (req, res) => {
     if (success) {
       return res.status(200).json({ redirect_url: invoice.url });
     } else {
-      console.error('❌ Échec création facture PayDunya :', invoice.response);
+      console.error('❌ Échec création facture PayDunya :', invoice.response, invoice.response_text);
       return res.status(400).json({
         error: invoice.response_text || 'Erreur lors de la création de la facture.',
         response: invoice.response || null,
