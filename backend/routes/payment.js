@@ -71,7 +71,7 @@ router.post('/ipn', express.urlencoded({ extended: true }), async (req, res) => 
   try {
     const expectedHash = crypto
       .createHash('sha512')
-      .update(process.env.PAYDUNYA_MASTER_KEY)
+      .update(data + process.env.PAYDUNYA_MASTER_KEY)
       .digest('hex');
 
     if (hash !== expectedHash) {
@@ -91,7 +91,7 @@ router.post('/ipn', express.urlencoded({ extended: true }), async (req, res) => 
       try {
         const flexResponse = await axios.post(`${process.env.PAYDUNYA_IPN_URL}/api/flex/transition`, {
           transactionId: reservationId,
-          transition: 'transition/confirm-payment'
+          transition: 'transition/external-payment'
         });
 
         console.log(' Paiement + transition Flex :', flexResponse.data);

@@ -71,8 +71,8 @@ export default function Checkout() {
           className="border border-green-300 p-2 w-full rounded mb-3"
           type="number"
           placeholder="Montant en FCFA"
-          value={amount / 100}
-          onChange={(e) => setAmount(e.target.value * 100)}
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
         />
 
         <input
