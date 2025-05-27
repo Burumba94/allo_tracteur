@@ -10,7 +10,7 @@ const setup = new paydunya.Setup({
   privateKey: process.env.PAYDUNYA_PRIVATE_KEY,
   publicKey: process.env.PAYDUNYA_PUBLIC_KEY,
   token: process.env.PAYDUNYA_TOKEN,
-  mode: 'test',
+  mode: process.env.PAYDUNYA_MODE || 'test',
 });
 
 const store = new paydunya.Store({
