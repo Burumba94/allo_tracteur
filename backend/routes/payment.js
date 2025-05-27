@@ -31,7 +31,7 @@ router.post('/initiate', async (req, res) => {
       return res.status(400).json({ error: 'Montant ou ID réservation invalide' });
     }
 
-    const unitPrice = parseFloat(amount);
+    const unitPrice = parseFloat(amount) / 100;
     if (unitPrice > 3000000) {
       return res.status(400).json({ error: 'Montant trop élevé. Maximum autorisé : 3 000 000 FCFA.' });
     }
