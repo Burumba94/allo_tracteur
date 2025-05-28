@@ -42,7 +42,7 @@ router.post('/initiate', async (req, res) => {
       description: `Réservation tracteur ID ${reservationId}`
     });
 
-    invoice.setTotalAmount(unitPrice);
+    invoice.totalAmount = unitPrice;
 
     invoice.setCustomData({
       reservationId: reservationId,
