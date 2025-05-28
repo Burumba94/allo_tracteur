@@ -3,7 +3,6 @@ import paydunya from 'paydunya';
 
 const router = express.Router();
 
-// Configuration PayDunya
 const setup = new paydunya.Setup({
   masterKey: process.env.PAYDUNYA_MASTER_KEY,
   privateKey: process.env.PAYDUNYA_PRIVATE_KEY,
@@ -22,55 +21,54 @@ const store = new paydunya.Store({
 });
 
 router.post('/initiate', async (req, res) => {
+  const { amount, reservationId } = req.body;
+
   try {
-    const { amount, reservationId } = req.body;
+    const numericAmount = parseInt(amount);
 
-    // Validation simple du montant et réservation
-    const unitPrice = parseInt(amount, 10);
-
-    if (!unitPrice || isNaN(unitPrice) || unitPrice <= 0) {
-      return res.status(400).json({ error: 'Montant invalide.' });
-    }
-    if (!reservationId) {
-      return res.status(400).json({ error: 'ID réservation manquant.' });
+    if (!numericAmount || !reservationId || isNaN(numericAmount) || numericAmount <= 0) {
+      return res.status(400).json({ error: 'Montant ou ID réservation invalide' });
     }
 
-    // Limite du montant si besoin (exemple: max 3 000 000 FCFA)
-    if (unitPrice > 3000000) {
-      return res.status(400).json({ error: 'Montant trop élevé (max 3 000 000 FCFA).' });
+    if (numericAmount > 3000000) {
+      return res.status(400).json({ error: 'Montant trop élevé. Maximum autorisé : 3 000 000 FCFA.' });
     }
 
-    // Création facture PayDunya
     const invoice = new paydunya.CheckoutInvoice(setup, store);
 
-    invoice.addItem('Réservation tracteur', 1, unitPrice, unitPrice);
-    invoice.totalAmount = unitPrice;
-    invoice.description = `Réservation ID ${reservationId}`;
+    invoice.addItem('Location Tracteur', 1, numericAmount, numericAmount);
+    invoice.totalAmount = numericAmount;
+    invoice.description = `Réservation tracteur - ID ${reservationId}`;
     invoice.customData = { reservationId };
-
     invoice.callbackURL = process.env.PAYDUNYA_IPN_URL;
     invoice.returnURL = process.env.PAYDUNYA_RETURN_URL;
     invoice.cancelURL = process.env.PAYDUNYA_CANCEL_URL;
 
-    // Création invoice PayDunya
+    invoice.taxes = [
+      {
+        name: 'TVA',
+        amount: Math.round(numericAmount * 0.18),
+        included: false,
+      },
+    ];
+
+    invoice.metadata = {
+      client_note: 'Merci pour votre réservation chez Allô Tracteur',
+    };
+
     const success = await invoice.create();
 
-    // Debug réponse PayDunya (log côté serveur)
-    console.log('PayDunya response:', invoice.response);
-    console.log('PayDunya response text:', invoice.response_text);
-
     if (success) {
-      // On retourne l'URL de redirection vers la page de paiement
       return res.status(200).json({ redirect_url: invoice.url });
     } else {
       return res.status(400).json({
-        error: invoice.response_text || 'Erreur lors de la création de la facture PayDunya.',
+        error: invoice.response_text || 'Erreur création facture.',
         response: invoice.response || null,
       });
     }
   } catch (error) {
-    console.error('Erreur /api/payment/initiate:', error);
-    return res.status(500).json({ error: 'Erreur serveur lors de l\'initiation du paiement.' });
+    console.error('Erreur /initiate:', error);
+    return res.status(500).json({ error: 'Erreur serveur paiement.' });
   }
 });
 

@@ -1,41 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'; 
 import { useSearchParams } from 'react-router-dom';
 
 export default function Checkout() {
   const [amount, setAmount] = useState('');
   const [reservationId, setReservationId] = useState('');
-  const [rawAmount, setRawAmount] = useState('');
   const [message, setMessage] = useState('');
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const initialAmount = searchParams.get('amount');
+    const initialAmount = searchParams.get('amount');       // ex: "80000"
     const initialReservationId = searchParams.get('reservationId');
 
     if (initialAmount) {
-      setRawAmount(initialAmount); // ⬅️ Montant brut (ex: 8000000)
-      const displayAmount = parseInt(initialAmount) / 100; // ⬅️ Montant affiché (ex: 80000 FCFA)
-      setAmount(displayAmount);
+      setAmount(initialAmount);  // Montant en FCFA tel quel, pas en centimes
     }
-
     if (initialReservationId) {
       setReservationId(initialReservationId);
     }
   }, []);
 
   const handlePayment = async () => {
-    if (!rawAmount || !reservationId) {
+    const numericAmount = parseInt(amount);
+    if (!numericAmount || !reservationId) {
       setMessage('Veuillez remplir tous les champs.');
       return;
     }
-
-    const numericAmount = parseInt(rawAmount); // ⬅️ On envoie le montant brut reçu de Sharetribe
-    if (isNaN(numericAmount) || numericAmount <= 0) {
+    if (numericAmount <= 0) {
       setMessage('Le montant est invalide.');
       return;
     }
-
-    if (numericAmount > 3000000 * 100) {
+    if (numericAmount > 3000000) {
       setMessage('Le montant maximum autorisé est de 3 000 000 FCFA.');
       return;
     }
@@ -45,7 +39,7 @@ export default function Checkout() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: numericAmount, // 💰 En centimes mais traité comme FCFA côté backend
+          amount: numericAmount,   // FCFA, PAS en centimes
           reservationId,
         }),
       });
@@ -79,10 +73,7 @@ export default function Checkout() {
           type="number"
           placeholder="Montant en FCFA"
           value={amount}
-          onChange={(e) => {
-            setAmount(e.target.value);
-            setRawAmount(e.target.value * 100); // ⬅️ Assure cohérence si modifié manuellement
-          }}
+          onChange={(e) => setAmount(e.target.value)}
         />
 
         <input
