@@ -24,7 +24,7 @@ export default function Checkout() {
       return;
     }
 
-    const numericAmount = parseInt(amount); // <-- En centimes
+    const numericAmount = parseInt(amount); // <-- En FCFA
     if (isNaN(numericAmount) || numericAmount <= 0) {
       setMessage('Le montant est invalide.');
       return;
