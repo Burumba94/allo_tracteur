@@ -13,9 +13,6 @@ export default function Checkout() {
 
     if (initialAmount) setAmount(initialAmount);
     if (initialReservationId) setReservationId(initialReservationId);
-
-    console.log('Montant Sharetribe (centimes EUR) récupéré depuis l’URL :', initialAmount);
-    console.log('ID Réservation depuis l’URL :', initialReservationId);
   }, []);
 
   const handlePayment = async () => {
@@ -24,9 +21,14 @@ export default function Checkout() {
       return;
     }
 
-    const numericAmount = parseInt(amount); // ← centimes d'euro
+    const numericAmount = parseInt(amount); // 💡 Ce montant est en FCFA, pas besoin de diviser
     if (isNaN(numericAmount) || numericAmount <= 0) {
       setMessage('Le montant est invalide.');
+      return;
+    }
+
+    if (numericAmount > 3000000) {
+      setMessage('Le montant maximum autorisé est de 3 000 000 FCFA.');
       return;
     }
 
@@ -35,7 +37,7 @@ export default function Checkout() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: numericAmount,
+          amount: numericAmount, // Envoyé en FCFA
           reservationId,
         }),
       });
@@ -44,7 +46,7 @@ export default function Checkout() {
       if (res.ok && data.redirect_url) {
         window.location.href = data.redirect_url;
       } else {
-        setMessage(data.error || 'Erreur inconnue lors du paiement.');
+        setMessage(data.error || 'Erreur inconnue.');
       }
     } catch (error) {
       console.error('Erreur fetch:', error);
@@ -60,12 +62,14 @@ export default function Checkout() {
       ></div>
 
       <div className="relative z-10 bg-white p-6 rounded-xl shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4 text-center text-green-700">Paiement Mobile Money</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center text-green-700">
+          Paiement Mobile Money
+        </h2>
 
         <input
           className="border border-green-300 p-2 w-full rounded mb-3"
           type="number"
-          placeholder="Montant en centimes d'euro (de Sharetribe)"
+          placeholder="Montant en FCFA"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
