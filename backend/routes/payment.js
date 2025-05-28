@@ -5,6 +5,8 @@ import axios from 'axios';
 
 const router = express.Router();
 
+const euroToCfa = (euroAmount) => Math.round(euroAmount * 655.957); // Taux officiel fixe
+
 const setup = new paydunya.Setup({
   masterKey: process.env.PAYDUNYA_MASTER_KEY,
   privateKey: process.env.PAYDUNYA_PRIVATE_KEY,
@@ -31,22 +33,16 @@ router.post('/initiate', async (req, res) => {
       return res.status(400).json({ error: 'Montant ou ID réservation invalide' });
     }
 
-    const unitPrice = parseFloat(amount);
-    if (unitPrice > 3000000) {
+    const euroAmount = amount / 100; // ← amount vient de Sharetribe en centimes EUR
+    const cfaAmount = euroToCfa(euroAmount); // ← conversion propre
+
+    if (cfaAmount > 3000000) {
       return res.status(400).json({ error: 'Montant trop élevé. Maximum autorisé : 3 000 000 FCFA.' });
     }
 
-    console.log('PAYDUNYA config:', {
-      masterKey: process.env.PAYDUNYA_MASTER_KEY,
-      privateKey:process.env.PAYDUNYA_PRIVATE_KEY,
-      publicKey: process.env.PAYDUNYA_PUBLIC_KEY,
-      token: process.env.PAYDUNYA_TOKEN,
-    });
-
     const invoice = new paydunya.CheckoutInvoice(setup, store);
-
-    invoice.addItem('Réservation tracteur', 1, unitPrice, unitPrice);
-    invoice.totalAmount = unitPrice;
+    invoice.addItem('Réservation tracteur', 1, cfaAmount, cfaAmount);
+    invoice.totalAmount = cfaAmount;
     invoice.description = `Réservation ID ${reservationId}`;
     invoice.customData = { reservationId };
 
@@ -68,52 +64,6 @@ router.post('/initiate', async (req, res) => {
   } catch (error) {
     console.error('🔥 Exception /initiate PayDunya:', error);
     res.status(500).json({ error: 'Erreur interne du serveur.' });
-  }
-});
-
-// IPN CALLBACK
-router.post('/ipn', express.urlencoded({ extended: true }), async (req, res) => {
-  const { data, hash } = req.body;
-
-  try {
-    const expectedHash = crypto
-      .createHash('sha512')
-      .update(data + process.env.PAYDUNYA_MASTER_KEY)
-      .digest('hex');
-
-    if (hash !== expectedHash) {
-      return res.status(400).json({ message: 'Hash invalide' });
-    }
-
-    const invoice = new paydunya.CheckoutInvoice(setup, store);
-    await invoice.confirm(data.token);
-
-    if (invoice.status === 'completed') {
-      const reservationId = invoice.customData?.reservationId;
-
-      if (!reservationId) {
-        return res.status(400).json({ message: 'Aucun ID de réservation trouvé.' });
-      }
-
-      try {
-        const flexResponse = await axios.post(`${process.env.PAYDUNYA_IPN_URL}/api/flex/transition`, {
-          transactionId: reservationId,
-          transition: 'transition/external-payment'
-        });
-
-        console.log(' Paiement + transition Flex :', flexResponse.data);
-        return res.status(200).json({ message: 'Paiement confirmé et transition effectuée' });
-
-      } catch (flexErr) {
-        console.error(' Erreur transition Flex:', flexErr.response?.data || flexErr.message);
-        return res.status(500).json({ message: 'Paiement reçu mais transition échouée' });
-      }
-    } else {
-      return res.status(200).json({ message: 'Paiement non complété' });
-    }
-  } catch (error) {
-    console.error("💥 Erreur IPN:", error);
-    return res.status(500).json({ message: "Erreur serveur IPN" });
   }
 });
 

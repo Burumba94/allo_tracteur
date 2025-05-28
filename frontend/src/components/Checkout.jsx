@@ -14,7 +14,7 @@ export default function Checkout() {
     if (initialAmount) setAmount(initialAmount);
     if (initialReservationId) setReservationId(initialReservationId);
 
-    console.log('Montant récupéré depuis l’URL :', initialAmount);
+    console.log('Montant Sharetribe (centimes EUR) récupéré depuis l’URL :', initialAmount);
     console.log('ID Réservation depuis l’URL :', initialReservationId);
   }, []);
 
@@ -24,14 +24,9 @@ export default function Checkout() {
       return;
     }
 
-    const numericAmount = parseInt(amount); // <-- En FCFA
+    const numericAmount = parseInt(amount); // ← centimes d'euro
     if (isNaN(numericAmount) || numericAmount <= 0) {
       setMessage('Le montant est invalide.');
-      return;
-    }
-
-    if (numericAmount > 3000000) {
-      setMessage('Le montant maximum autorisé est de 3 000 000 FCFA.');
       return;
     }
 
@@ -70,7 +65,7 @@ export default function Checkout() {
         <input
           className="border border-green-300 p-2 w-full rounded mb-3"
           type="number"
-          placeholder="Montant en FCFA"
+          placeholder="Montant en centimes d'euro (de Sharetribe)"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
