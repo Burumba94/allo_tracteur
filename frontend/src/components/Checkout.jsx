@@ -30,7 +30,7 @@ export default function Checkout() {
       return;
     }
 
-    if (numericAmount > 3000000 * 100) {
+    if (numericAmount > 3000000) {
       setMessage('Le montant maximum autorisé est de 3 000 000 FCFA.');
       return;
     }
