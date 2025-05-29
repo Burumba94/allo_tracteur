@@ -1,3 +1,4 @@
+// ✅ Fichier backend payment.js corrigé pour PayDunya
 import express from 'express';
 import paydunya from 'paydunya';
 import crypto from 'crypto';
@@ -26,7 +27,7 @@ router.post('/initiate', async (req, res) => {
   const { amount, reservationId } = req.body;
 
   try {
-    const unitPrice = parseInt(amount); // Montant saisi (ex: 80000 FCFA)
+    const unitPrice = parseInt(amount);
 
     if (!unitPrice || !reservationId || isNaN(unitPrice) || unitPrice <= 0) {
       return res.status(400).json({ error: 'Montant ou ID réservation invalide' });
@@ -36,10 +37,12 @@ router.post('/initiate', async (req, res) => {
       return res.status(400).json({ error: 'Montant trop élevé. Maximum autorisé : 3 000 000 FCFA.' });
     }
 
+    console.log('💸 Création facture PayDunya avec montant :', unitPrice);
+
     const invoice = new paydunya.CheckoutInvoice(setup, store);
 
-    invoice.addItem("Location de tracteur", 1, unitPrice, unitPrice, {
-      description: `Réservation tracteur ID ${reservationId}`
+    invoice.addItem('Location de tracteur', 1, unitPrice, unitPrice, {
+      description: `Réservation tracteur ID ${reservationId}`,
     });
 
     invoice.totalAmount = unitPrice;
@@ -61,10 +64,10 @@ router.post('/initiate', async (req, res) => {
     const success = await invoice.create();
 
     if (success) {
+      console.log('✅ Facture PayDunya créée :', invoice.token);
       return res.status(200).json({ redirect_url: invoice.url });
     } else {
-      console.error("PayDunya response:", invoice.response);
-      console.error("PayDunya response text:", invoice.response_text);
+      console.error('❌ PayDunya error:', invoice.response_text);
       return res.status(400).json({
         error: invoice.response_text || 'Erreur création facture.',
         response: invoice.response || null,
@@ -77,3 +80,4 @@ router.post('/initiate', async (req, res) => {
 });
 
 export default router;
+
