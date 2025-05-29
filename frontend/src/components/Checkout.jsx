@@ -1,3 +1,4 @@
+//  Checkout.jsx corrigé pour PayDunya avec conversion correcte
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
@@ -12,7 +13,9 @@ export default function Checkout() {
     const initialReservationId = searchParams.get('reservationId');
 
     if (initialAmount) {
-      setAmount(initialAmount); // FCFA déjà
+      // Convertir de centimes à FCFA si montant brut (ex: 8000000 => 80000)
+      const adjusted = parseInt(initialAmount, 10) / 100;
+      setAmount(adjusted.toString());
     }
 
     if (initialReservationId) {
@@ -39,7 +42,7 @@ export default function Checkout() {
     }
 
     try {
-      const res = await fetch('https://allo-tracteur.onrender.com/api/payment/initiate', {
+      const res = await fetch('https://allo-tracteur-backend.onrender.com/api/payment/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -98,3 +101,4 @@ export default function Checkout() {
     </div>
   );
 }
+
