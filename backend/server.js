@@ -15,7 +15,9 @@ const port = process.env.PORT || 5000;
 // Liste des origines autorisées
 const allowedOrigins = [
   'http://localhost:5173', // Frontend en développement
-  'https://allo-tracteur.vercel.app' // Frontend en production
+  'https://allo-tracteur.vercel.app', // Frontend en production
+  'https://allo-tracteur.vercel.app/checkout',
+  'https://allo-tracteur.vercel.app/checkout?reservationId=6813a759-fbce-4bad-a6f4-c05900f341ef&amount=8000000'
 ];
 
 // Configuration CORS
