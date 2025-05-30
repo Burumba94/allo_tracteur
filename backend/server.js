@@ -1,22 +1,17 @@
-// server.js mis à jour avec gestion CORS autorisant Vercel + Localhost
+// server.js mis à jour avec flexRouter
 import dotenv from 'dotenv';
 dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
 import sharetribeIntegrationSdk from 'sharetribe-flex-integration-sdk';
+
 import paymentRouter from './routes/payment.js';
 import listingsRouter from './routes/listings.js';
+import flexRouter from './routes/flex.js'; // ✅ Import du routeur Flex
 
 const app = express();
 const port = process.env.PORT || 5000;
-
-// Création de l'instance SDK Sharetribe
-const sdk = sharetribeIntegrationSdk.createInstance({
-  clientId: process.env.FLEX_INTEGRATION_CLIENT_ID,
-  clientSecret: process.env.FLEX_INTEGRATION_CLIENT_SECRET,
-  tokenStore: sharetribeIntegrationSdk.tokenStore.memoryStore(),
-});
 
 // Définition des origines autorisées
 const allowedOrigins = [
@@ -24,7 +19,7 @@ const allowedOrigins = [
   'https://allo-tracteur.vercel.app'
 ];
 
-// Middleware CORS configuré
+// Configuration CORS
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -38,24 +33,21 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
-// Important : autoriser les requêtes préflight (OPTIONS)
 app.options('*', cors(corsOptions));
-
 app.use(express.json());
 
-// Route d'accueil
+// Route d’accueil simple
 app.get('/', (req, res) => {
-  res.send(' Backend Allô Tracteur en ligne sur Render !');
+  res.send('✅ Backend Allô Tracteur est en ligne !');
 });
 
-// Routes principales
-app.use('/api/listings', listingsRouter);
+// Routes API
 app.use('/api/payment', paymentRouter);
+app.use('/api/listings', listingsRouter);
+app.use('/api/flex', flexRouter); // ✅ Montée du routeur Flex avec préfixe
+// Attention : routes dans flex.js doivent être sans préfixe (/transition etc.)
 
-// Lancement du serveur
+// Démarrage du serveur
 app.listen(port, () => {
-  console.log(` Serveur démarré sur http://localhost:${port}`);
+  console.log(`🚀 Serveur lancé sur http://localhost:${port}`);
 });
-
-
