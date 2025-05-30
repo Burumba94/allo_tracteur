@@ -12,51 +12,47 @@ import flexRouter from './routes/flex.js';
 const app = express();
 const port = process.env.PORT || 5000;
 
-// 🌍 Liste des origines autorisées
+// Liste des origines autorisées
 const allowedOrigins = [
   'http://localhost:5173',
   'https://allo-tracteur.vercel.app'
 ];
 
-// ✅ Middleware CORS
-app.use(cors({
+// Configuration CORS
+const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error('Origine non autorisée'));
     }
   },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-}));
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
 
-// ✅ Middleware manuel pour gérer les requêtes OPTIONS (préflight)
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Access-Control-Allow-Credentials', 'true');
+// Appliquer le middleware CORS
+app.use(cors(corsOptions));
 
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200); // Répond OK à toutes les requêtes préflight
-  }
+// Middleware pour gérer les requêtes préliminaires (OPTIONS)
+app.options('*', cors(corsOptions));
 
-  next();
-});
-
-// 🧠 Important : body parser
+// Middleware pour analyser les corps de requêtes JSON
 app.use(express.json());
 
-// ✅ Routes
+// Routes
 app.get('/', (req, res) => {
   res.send('✅ Backend Allô Tracteur est en ligne !');
 });
 
 app.use('/api/payment', paymentRouter);
 app.use('/api/listings', listingsRouter);
-app.use('/api/flex', flexRouter);
+app.use('/api/flex', flexRouter); // Assurez-vous que les routes dans flex.js sont sans préfixe
 
+// Démarrage du serveur
 app.listen(port, () => {
   console.log(`🚀 Serveur lancé sur http://localhost:${port}`);
 });
-
