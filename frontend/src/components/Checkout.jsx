@@ -1,4 +1,3 @@
-//  Checkout.jsx corrigé pour PayDunya avec conversion correcte
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
@@ -21,7 +20,7 @@ export default function Checkout() {
     if (initialReservationId) {
       setReservationId(initialReservationId);
     }
-  }, []);
+  }, [searchParams]);
 
   const handlePayment = async () => {
     const numericAmount = parseInt(amount);
@@ -44,7 +43,10 @@ export default function Checkout() {
     try {
       const res = await fetch('https://allo-tracteur-backend.onrender.com/api/payment/initiate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        // credentials: 'include', // à activer uniquement si le backend gère les cookies
         body: JSON.stringify({
           amount: numericAmount,
           reservationId,
@@ -52,6 +54,7 @@ export default function Checkout() {
       });
 
       const data = await res.json();
+
       if (res.ok && data.redirect_url) {
         window.location.href = data.redirect_url;
       } else {
@@ -71,7 +74,9 @@ export default function Checkout() {
       ></div>
 
       <div className="relative z-10 bg-white p-6 rounded-xl shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4 text-center text-green-700">Paiement Mobile Money</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center text-green-700">
+          Paiement Mobile Money
+        </h2>
 
         <input
           className="border border-green-300 p-2 w-full rounded mb-3"
@@ -96,9 +101,12 @@ export default function Checkout() {
           Payer maintenant
         </button>
 
-        {message && <p className="mt-4 text-red-500 text-center">{message}</p>}
+        {message && (
+          <p className="mt-4 text-red-500 text-center">{message}</p>
+        )}
       </div>
     </div>
   );
 }
+
 
