@@ -1,4 +1,3 @@
-// server.js mis à jour avec flexRouter
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -8,46 +7,41 @@ import sharetribeIntegrationSdk from 'sharetribe-flex-integration-sdk';
 
 import paymentRouter from './routes/payment.js';
 import listingsRouter from './routes/listings.js';
-import flexRouter from './routes/flex.js'; // ✅ Import du routeur Flex
+import flexRouter from './routes/flex.js';
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Définition des origines autorisées
+// 🌍 Liste des origines autorisées
 const allowedOrigins = [
   'http://localhost:5173',
   'https://allo-tracteur.vercel.app'
 ];
 
-// Configuration CORS
-const corsOptions = {
-  origin: (origin, callback) => {
+// ✅ Middleware CORS simplifié pour Render
+app.use(cors({
+  origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('CORS non autorisé'));
+      callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST', 'OPTIONS'],
-  credentials: true
-};
+  credentials: true,
+}));
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+// 🧠 Toujours placer avant les routes
 app.use(express.json());
 
-// Route d’accueil simple
+// ✅ Routes
 app.get('/', (req, res) => {
   res.send('✅ Backend Allô Tracteur est en ligne !');
 });
 
-// Routes API
 app.use('/api/payment', paymentRouter);
 app.use('/api/listings', listingsRouter);
-app.use('/api/flex', flexRouter); // ✅ Montée du routeur Flex avec préfixe
-// Attention : routes dans flex.js doivent être sans préfixe (/transition etc.)
+app.use('/api/flex', flexRouter); // OK si flex.js utilise des routes **sans prefix**
 
-// Démarrage du serveur
 app.listen(port, () => {
   console.log(`🚀 Serveur lancé sur http://localhost:${port}`);
 });
