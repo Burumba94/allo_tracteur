@@ -1,13 +1,12 @@
-// server.js
-
+// server.js mis à jour avec gestion CORS autorisant Vercel + Localhost
 import dotenv from 'dotenv';
 dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
 import sharetribeIntegrationSdk from 'sharetribe-flex-integration-sdk';
-import paymentRouter from './routes/payment.js'; // import du routeur paiement
-import listingsRouter from './routes/listings.js'; // IMPORT du routeur listings
+import paymentRouter from './routes/payment.js';
+import listingsRouter from './routes/listings.js';
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -19,8 +18,23 @@ const sdk = sharetribeIntegrationSdk.createInstance({
   tokenStore: sharetribeIntegrationSdk.tokenStore.memoryStore(),
 });
 
-// Middlewares
-app.use(cors());
+// Middleware CORS sécurisé pour autoriser uniquement Vercel et Localhost
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://allo-tracteur.vercel.app'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS non autorisé'));
+  },
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Route d'accueil simple
@@ -28,7 +42,7 @@ app.get('/', (req, res) => {
   res.send('✅ Backend Allô Tracteur en ligne sur Render !');
 });
 
-// Utilisation du routeur listings
+// Routes principales
 app.use('/api/listings', listingsRouter);
 app.use('/api/payment', paymentRouter);
 
@@ -36,3 +50,4 @@ app.use('/api/payment', paymentRouter);
 app.listen(port, () => {
   console.log(`🚀 Serveur démarré sur http://localhost:${port}`);
 });
+
