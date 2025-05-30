@@ -1,9 +1,11 @@
+// routes/flex.js
 import express from 'express';
 import sdkPkg from 'sharetribe-flex-integration-sdk';
 
 const { createInstance, types } = sdkPkg;
 const router = express.Router();
 
+// ⚙️ Chargement des variables d'environnement
 const clientId = process.env.FLEX_INTEGRATION_CLIENT_ID;
 const clientSecret = process.env.FLEX_INTEGRATION_CLIENT_SECRET;
 const baseUrl = process.env.FLEX_API_BASE_URL;
@@ -12,14 +14,18 @@ if (!clientId || !clientSecret || !baseUrl) {
   throw new Error("Les variables d'environnement nécessaires sont manquantes.");
 }
 
+// ✅ Initialisation SDK Sharetribe
 const sdk = createInstance({
   clientId,
   clientSecret,
   baseUrl,
 });
 
-// 🔄 Transition manuelle déclenchée via PayDunya IPN
-router.post('/api/flex/transition', async (req, res) => {
+/**
+ * 🔄 Route : transition manuelle (ex: après IPN PayDunya)
+ * POST /api/flex/transition
+ */
+router.post('/transition', async (req, res) => {
   const { transactionId, transition } = req.body;
 
   if (!transactionId || !transition) {
@@ -30,10 +36,13 @@ router.post('/api/flex/transition', async (req, res) => {
     const response = await sdk.transactions.transition({
       id: types.uuid(transactionId),
       transition,
-      params: {}, // Tu peux ajouter protectedData ici si besoin
+      params: {},
     });
 
-    res.status(200).json({ message: 'Transition effectuée avec succès', result: response.data });
+    res.status(200).json({
+      message: 'Transition effectuée avec succès',
+      result: response.data,
+    });
   } catch (error) {
     console.error('❌ Erreur transition Flex :', error.response?.data || error.message);
     res.status(500).json({
@@ -43,8 +52,11 @@ router.post('/api/flex/transition', async (req, res) => {
   }
 });
 
-// 🔰 Création d’une réservation initiale (request-payment sans Stripe)
-router.post('/api/flex/initiate', async (req, res) => {
+/**
+ * 🎯 Route : création d’une réservation initiale (sans Stripe)
+ * POST /api/flex/initiate
+ */
+router.post('/initiate', async (req, res) => {
   const { listingId, start, end, customerId } = req.body;
 
   if (!listingId || !start || !end || !customerId) {
@@ -53,8 +65,8 @@ router.post('/api/flex/initiate', async (req, res) => {
 
   try {
     const response = await sdk.transactions.initiate({
-      processAlias: 'default-booking/default', // Ton process personnalisé
-      transition: 'transition/request-payment', // Ne déclenche pas Stripe
+      processAlias: 'default-booking/default',
+      transition: 'transition/request-payment',
       params: {
         listingId: types.uuid(listingId),
         customerId: types.uuid(customerId),
@@ -72,7 +84,7 @@ router.post('/api/flex/initiate', async (req, res) => {
       transaction: response.data,
     });
   } catch (error) {
-    console.error('❌ Erreur création de transaction Flex:', error.response?.data || error.message);
+    console.error('❌ Erreur création transaction Flex:', error.response?.data || error.message);
     res.status(500).json({
       error: 'Erreur lors de la création de la transaction',
       detail: error.response?.data,
@@ -80,8 +92,11 @@ router.post('/api/flex/initiate', async (req, res) => {
   }
 });
 
-// 📦 Listing de base
-router.get('/api/listings/query', async (req, res) => {
+/**
+ * 📦 Route : récupération de listings Flex
+ * GET /api/flex/listings/query
+ */
+router.get('/listings/query', async (req, res) => {
   try {
     const response = await sdk.listings.query({ perPage: 5 });
 
