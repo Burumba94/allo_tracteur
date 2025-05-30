@@ -1,11 +1,10 @@
-//  Fichier backend payment.js corrigé pour Express (path relatif dans router.options)
+// routes/payment.js
 import express from 'express';
 import paydunya from 'paydunya';
-import crypto from 'crypto';
-import axios from 'axios';
 
 const router = express.Router();
 
+// Configuration PayDunya
 const setup = new paydunya.Setup({
   masterKey: process.env.PAYDUNYA_MASTER_KEY,
   privateKey: process.env.PAYDUNYA_PRIVATE_KEY,
@@ -23,17 +22,10 @@ const store = new paydunya.Store({
   cancelURL: process.env.PAYDUNYA_CANCEL_URL,
 });
 
-//  Répondre aux requêtes CORS preflight (Express attend un chemin relatif !)
-router.options('/initiate', (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://allo-tracteur.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.sendStatus(200);
-});
-
+// Route POST pour initier un paiement
 router.post('/initiate', async (req, res) => {
   const { amount, reservationId } = req.body;
-  console.log('📥 Requête reçue :', req.body);
+  console.log('📥 Requête paiement reçue :', req.body);
 
   try {
     const unitPrice = parseInt(amount);
@@ -55,7 +47,7 @@ router.post('/initiate', async (req, res) => {
     invoice.totalAmount = unitPrice;
 
     invoice.setCustomData({
-      reservationId: reservationId,
+      reservationId,
       clientSource: 'AlloTracteurApp',
     });
 
@@ -71,7 +63,7 @@ router.post('/initiate', async (req, res) => {
     const success = await invoice.create();
 
     if (success) {
-      console.log(' Facture PayDunya créée :', invoice.url);
+      console.log('✅ Facture PayDunya créée :', invoice.url);
       return res.status(200).json({ redirect_url: invoice.url });
     } else {
       console.error('❌ Erreur PayDunya:', invoice.response_text);
