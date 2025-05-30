@@ -46,7 +46,7 @@ export default function Checkout() {
         headers: {
           'Content-Type': 'application/json'
         },
-        // credentials: 'include', // à activer uniquement si le backend gère les cookies
+        credentials: 'include', 
         body: JSON.stringify({
           amount: numericAmount,
           reservationId,
