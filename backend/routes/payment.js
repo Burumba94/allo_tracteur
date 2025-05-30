@@ -1,4 +1,3 @@
-// Fichier backend payment.js mis à jour pour corriger CORS avec preflight
 import express from 'express';
 import paydunya from 'paydunya';
 import crypto from 'crypto';
@@ -23,14 +22,6 @@ const store = new paydunya.Store({
   cancelURL: process.env.PAYDUNYA_CANCEL_URL,
 });
 
-//  Répondre aux requêtes CORS preflight pour /initiate
-router.options('/initiate', (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://allo-tracteur.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.sendStatus(200);
-});
-
 router.post('/initiate', async (req, res) => {
   const { amount, reservationId } = req.body;
 
@@ -45,7 +36,7 @@ router.post('/initiate', async (req, res) => {
       return res.status(400).json({ error: 'Montant trop élevé. Maximum autorisé : 3 000 000 FCFA.' });
     }
 
-    console.log(' Création facture PayDunya avec montant :', unitPrice);
+    console.log('Création facture PayDunya avec montant :', unitPrice);
 
     const invoice = new paydunya.CheckoutInvoice(setup, store);
 
@@ -72,10 +63,10 @@ router.post('/initiate', async (req, res) => {
     const success = await invoice.create();
 
     if (success) {
-      console.log(' Facture PayDunya créée :', invoice.token);
+      console.log('Facture PayDunya créée :', invoice.token);
       return res.status(200).json({ redirect_url: invoice.url });
     } else {
-      console.error('❌ PayDunya error:', invoice.response_text);
+      console.error(' PayDunya error:', invoice.response_text);
       return res.status(400).json({
         error: invoice.response_text || 'Erreur création facture.',
         response: invoice.response || null,
@@ -88,5 +79,6 @@ router.post('/initiate', async (req, res) => {
 });
 
 export default router;
+
 
 
