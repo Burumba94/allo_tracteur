@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
     // Répondre au frontend avec les mêmes données
     res.status(response.status).json(data);
-
+    
   } catch (error) {
     console.error('Erreur proxy:', error);
     res.status(500).json({ error: 'Erreur proxy', message: error.message });

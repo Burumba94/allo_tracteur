@@ -6,12 +6,26 @@
     },
     "api/proxy/payment.js": {
       "runtime": "nodejs18.x"
+    },
+    "api/proxy/listings.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/proxy/payment-success.js": {
+      "runtime": "nodejs18.x"
     }
   },
   "routes": [
     {
       "src": "/api/proxy/payment",
       "dest": "/api/proxy/payment.js"
+    },
+    {
+      "src": "/api/proxy/listings",
+      "dest": "/api/proxy/listings.js"
+    },
+    {
+      "src": "/api/proxy/payment-success",
+      "dest": "/api/proxy/payment-success.js"
     },
     {
       "src": "/api/(.*)",

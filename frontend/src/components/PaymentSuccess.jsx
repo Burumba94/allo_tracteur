@@ -11,7 +11,7 @@ export default function PaymentSuccess() {
     useEffect(() => {
         const confirmReservation = async () => {
             try {
-                const response = await fetch('/api/payment/success', {
+                const response = await fetch('/api/proxy/payment-success', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ reservationId })

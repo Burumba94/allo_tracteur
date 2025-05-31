@@ -9,7 +9,7 @@ const ListingList = () => {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await fetch('/api/listings/query');
+        const response = await fetch('/api/proxy/listings');
         if (!response.ok) throw new Error(`Erreur ${response.status}`);
         const data = await response.json();
         setListings(data.data.data || []);
