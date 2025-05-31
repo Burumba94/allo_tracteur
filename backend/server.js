@@ -11,7 +11,7 @@ import flexRouter from './routes/flex.js';
 const app = express();
 const port = process.env.PORT || 5000;
 
-/*Origines autorisées
+//Origines autorisées
 const allowedOrigins = [
   '*',
   'http://localhost:5173',
@@ -21,6 +21,8 @@ const allowedOrigins = [
 //  Configuration CORS sécurisée
 const corsOptions = {
   origin: function (origin, callback) {
+    console.log('Origine de la requête :', origin);
+    console.log('Origines autorisées', allowedOrigins);
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -34,14 +36,14 @@ const corsOptions = {
 };
 
 // Appliquer CORS avant tout
-app.use(cors(corsOptions)); */
+app.use(cors(corsOptions)); 
 
-app.use((req, res, next) => {
+/*app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET', 'POST', 'PUT', 'DELETE', 'OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type', 'Authorization');
   next();
-});
+}); */
 
 //  Body parser
 app.use(express.json());
