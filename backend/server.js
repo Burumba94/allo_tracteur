@@ -13,7 +13,6 @@ const port = process.env.PORT || 5000;
 
 //Origines autorisées
 const allowedOrigins = [
-  '*',
   'http://localhost:5173',
   'https://allo-tracteur.vercel.app'
 ];
@@ -23,7 +22,7 @@ const corsOptions = {
   origin: function (origin, callback) {
     console.log('Origine de la requête :', origin);
     console.log('Origines autorisées', allowedOrigins);
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin)|| allowedOrigins.includes('*')) {
       callback(null, true);
     } else {
       callback(new Error(`Origine non autorisée : ${origin}`));
