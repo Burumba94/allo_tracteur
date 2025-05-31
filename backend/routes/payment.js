@@ -24,7 +24,7 @@ const store = new paydunya.Store({
 // Route POST pour initier un paiement
 router.post('/initiate', async (req, res) => {
   const { amount, reservationId } = req.body;
-  console.log('📥 Requête paiement reçue :', req.body);
+  console.log(' Requête paiement reçue :', req.body);
 
   try {
     const unitPrice = parseInt(amount);
@@ -62,17 +62,17 @@ router.post('/initiate', async (req, res) => {
     const success = await invoice.create();
 
     if (success) {
-      console.log('✅ Facture PayDunya créée :', invoice.url);
+      console.log(' Facture PayDunya créée :', invoice.url);
       return res.status(200).json({ redirect_url: invoice.url });
     } else {
-      console.error('❌ Erreur PayDunya:', invoice.response_text);
+      console.error(' Erreur PayDunya:', invoice.response_text);
       return res.status(400).json({
         error: invoice.response_text || 'Erreur création facture.',
         response: invoice.response || null,
       });
     }
   } catch (error) {
-    console.error('🔥 Exception /initiate:', error);
+    console.error(' Exception /initiate:', error);
     return res.status(500).json({ error: 'Erreur serveur paiement.' });
   }
 });

@@ -5,7 +5,7 @@ import sdkPkg from 'sharetribe-flex-integration-sdk';
 const { createInstance, types } = sdkPkg;
 const router = express.Router();
 
-// ⚙️ Chargement des variables d'environnement
+// Chargement des variables d'environnement
 const clientId = process.env.FLEX_INTEGRATION_CLIENT_ID;
 const clientSecret = process.env.FLEX_INTEGRATION_CLIENT_SECRET;
 const baseUrl = process.env.FLEX_API_BASE_URL;
@@ -14,7 +14,7 @@ if (!clientId || !clientSecret || !baseUrl) {
   throw new Error("Les variables d'environnement nécessaires sont manquantes.");
 }
 
-// ✅ Initialisation SDK Sharetribe
+//  Initialisation SDK Sharetribe
 const sdk = createInstance({
   clientId,
   clientSecret,
@@ -22,7 +22,7 @@ const sdk = createInstance({
 });
 
 /**
- * 🔄 Route : transition manuelle (ex: après IPN PayDunya)
+ *  Route : transition manuelle (ex: après IPN PayDunya)
  * POST /api/flex/transition
  */
 router.post('/transition', async (req, res) => {
@@ -44,7 +44,7 @@ router.post('/transition', async (req, res) => {
       result: response.data,
     });
   } catch (error) {
-    console.error('❌ Erreur transition Flex :', error.response?.data || error.message);
+    console.error(' Erreur transition Flex :', error.response?.data || error.message);
     res.status(500).json({
       error: 'Erreur lors de la transition Flex',
       detail: error.response?.data,
@@ -53,7 +53,7 @@ router.post('/transition', async (req, res) => {
 });
 
 /**
- * 🎯 Route : création d’une réservation initiale (sans Stripe)
+ *  Route : création d’une réservation initiale (sans Stripe)
  * POST /api/flex/initiate
  */
 router.post('/initiate', async (req, res) => {
@@ -84,7 +84,7 @@ router.post('/initiate', async (req, res) => {
       transaction: response.data,
     });
   } catch (error) {
-    console.error('❌ Erreur création transaction Flex:', error.response?.data || error.message);
+    console.error(' Erreur création transaction Flex:', error.response?.data || error.message);
     res.status(500).json({
       error: 'Erreur lors de la création de la transaction',
       detail: error.response?.data,
@@ -93,7 +93,7 @@ router.post('/initiate', async (req, res) => {
 });
 
 /**
- * 📦 Route : récupération de listings Flex
+ *  Route : récupération de listings Flex
  * GET /api/flex/listings/query
  */
 router.get('/listings/query', async (req, res) => {
