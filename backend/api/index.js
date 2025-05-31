@@ -1,4 +1,3 @@
-// /api/index.js
 import express from 'express';
 import cors from 'cors';
 import serverless from 'serverless-http';
@@ -8,7 +7,7 @@ import flexRouter from '../routes/flex.js';
 
 const app = express();
 
-// 🌍 Origines autorisées
+// 🌍 Origines autorisées (ton frontend)
 const allowedOrigins = [
   'http://localhost:5173',
   'https://allo-tracteur.vercel.app'
@@ -17,6 +16,7 @@ const allowedOrigins = [
 // 🛡️ Configuration CORS
 const corsOptions = {
   origin: function (origin, callback) {
+    // Autoriser les requêtes sans origin (ex: Postman) et les origines dans la liste
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -29,11 +29,10 @@ const corsOptions = {
   optionsSuccessStatus: 204
 };
 
-// 🧠 Middlewares
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// 🔗 Routes
+// Routes API
 app.use('/api/payment', paymentRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/flex', flexRouter);
@@ -42,5 +41,4 @@ app.get('/api', (req, res) => {
   res.send('✅ API Allô Tracteur is up on Vercel!');
 });
 
-// ⛴️ Exporter le handler pour Vercel
 export default serverless(app);

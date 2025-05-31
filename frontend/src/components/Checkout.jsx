@@ -41,7 +41,7 @@ export default function Checkout() {
     }
 
     try {
-      const res = await fetch('api/proxy/payment', {
+      const res = await fetch('/api/payment/initiate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

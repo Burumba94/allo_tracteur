@@ -2,18 +2,6 @@
   "version": 2,
   "routes": [
     {
-      "src": "/api/proxy/payment",
-      "dest": "/api/proxy/payment.js"
-    },
-    {
-      "src": "/api/proxy/listings",
-      "dest": "/api/proxy/listings.js"
-    },
-    {
-      "src": "/api/proxy/payment-success",
-      "dest": "/api/proxy/payment-success.js"
-    },
-    {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
     }
