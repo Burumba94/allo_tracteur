@@ -11,28 +11,11 @@ import flexRouter from './routes/flex.js';
 const app = express();
 const port = process.env.PORT || 5000;
 
-// 🌍 Origines autorisées
-const allowedOrigins = [
-  'http://localhost:5173',                // Front local
-  'https://allo-tracteur.vercel.app'      // Front en prod
-];
-
-// 🔐 Configuration CORS sécurisée pour Express 5
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`⛔ Origine non autorisée : ${origin}`));
-    }
-  },
+app.use(cors({
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'x-client-key', 'x-client-token', 'x-client-secret', 'Authorization'],
-  optionsSuccessStatus: 204
-};
-
-// ✅ Middleware CORS placé tout au début
-app.use(cors(corsOptions));
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 
 // 🧠 Body parser
