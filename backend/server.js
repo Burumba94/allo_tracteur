@@ -3,7 +3,6 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import sharetribeIntegrationSdk from 'sharetribe-flex-integration-sdk';
 
 import paymentRouter from './routes/payment.js';
 import listingsRouter from './routes/listings.js';
@@ -12,56 +11,44 @@ import flexRouter from './routes/flex.js';
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Liste des origines autorisées
+// 🌍 Origines autorisées
 const allowedOrigins = [
-  'http://localhost:5173', // Frontend en développement
-  'https://allo-tracteur.vercel.app', // Frontend en production
-  'https://allo-tracteur.vercel.app/checkout',
-  'https://allo-tracteur.vercel.app/checkout?reservationId=6813a759-fbce-4bad-a6f4-c05900f341ef&amount=8000000'
+  'http://localhost:5173',                // Front local
+  'https://allo-tracteur.vercel.app'      // Front en prod
 ];
 
-// Configuration CORS
+// 🔐 Configuration CORS sécurisée pour Express 5
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Origine non autorisée'));
+      callback(new Error(`⛔ Origine non autorisée : ${origin}`));
     }
   },
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-  preflightContinue: false,
   optionsSuccessStatus: 204
 };
 
-// Appliquer le middleware CORS
+// ✅ Middleware CORS placé tout au début
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
 
-// Middleware pour analyser les corps de requêtes JSON
+
+// 🧠 Body parser
 app.use(express.json());
 
-// Route principale
+// 🌐 API routes
 app.get('/', (req, res) => {
   res.send('✅ Backend Allô Tracteur est en ligne !');
 });
 
-// Routes
 app.use('/api/payment', paymentRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/flex', flexRouter);
 
-// Gestion des erreurs
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Quelque chose a mal tourné !');
-});
-
-// Démarrage du serveur
+// 🚀 Serveur lancé
 app.listen(port, () => {
   console.log(`🚀 Serveur lancé sur http://localhost:${port}`);
 });
-
-
