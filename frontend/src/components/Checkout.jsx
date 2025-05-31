@@ -41,12 +41,12 @@ export default function Checkout() {
     }
 
     try {
-      const res = await fetch('https://allo-tracteur-backend.onrender.com/api/payment/initiate', {
+      const res = await fetch('https://allo-tracteur-backend.vercel.app/api/payment/initiate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        credentials: 'include', 
+        //credentials: 'include', 
         body: JSON.stringify({
           amount: numericAmount,
           reservationId,
