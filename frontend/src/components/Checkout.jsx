@@ -41,7 +41,7 @@ export default function Checkout() {
     }
 
     try {
-      const res = await fetch('/api/payment/initiate', {
+      const res = await fetch('https://allo-tracteur-backend.vercel.app/api/payment/initiate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -6,10 +6,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api/payment': {
+      '/api': {
         target: 'https://allo-tracteur-backend.vercel.app',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/payment/, '/api/payment'),
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },
