@@ -1,19 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/index.js": {
-      "runtime": "nodejs18.x"
-    },
-    "api/proxy/payment.js": {
-      "runtime": "nodejs18.x"
-    },
-    "api/proxy/listings.js": {
-      "runtime": "nodejs18.x"
-    },
-    "api/proxy/payment-success.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "routes": [
     {
       "src": "/api/proxy/payment",
