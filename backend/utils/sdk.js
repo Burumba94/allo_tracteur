@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+
 import pkg from 'sharetribe-flex-integration-sdk';
 
 const { createInstance, tokenStore } = pkg;
