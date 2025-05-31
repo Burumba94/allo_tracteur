@@ -13,6 +13,7 @@ const port = process.env.PORT || 5000;
 
 // 🌍 Origines autorisées
 const allowedOrigins = [
+  '*',
   'http://localhost:5173',
   'https://allo-tracteur.vercel.app'
 ];
@@ -26,7 +27,7 @@ const corsOptions = {
       callback(new Error(`⛔ Origine non autorisée : ${origin}`));
     }
   },
-  credentials: true,
+  //credentials: true,
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 204
