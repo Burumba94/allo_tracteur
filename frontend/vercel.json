@@ -2,11 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://allo-tracteur.onrender.com/api/:path*"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/"
+      "destination": "https://allo-tracteur-backend.onrender.com/api/:path*"
     }
   ]
 }
