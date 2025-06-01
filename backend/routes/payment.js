@@ -23,8 +23,9 @@ const store = new paydunya.Store({
 
 // Route POST pour initier un paiement
 router.post('/initiate', async (req, res) => {
-  const { amount, reservationId } = req.body;
   console.log(' Requête paiement reçue :', req.body);
+  const { amount, reservationId } = req.body;
+  
 
   try {
     const unitPrice = parseInt(amount);
