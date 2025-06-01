@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from 'react-router-dom';
-import { API_BASE_URL } from '../config';
+
 
 export default function PaymentSuccess() {
     const [ searchParams ] = useSearchParams();
@@ -12,7 +12,7 @@ export default function PaymentSuccess() {
     useEffect(() => {
         const confirmReservation = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/payment/success`, {
+                const response = await fetch(`https://allo-tracteur-backend.onrender.com/api/payment/success`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ reservationId })

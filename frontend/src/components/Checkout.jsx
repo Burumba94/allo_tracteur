@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { API_BASE_URL } from '../config';
+
 
 export default function Checkout() {
   const [amount, setAmount] = useState('');
@@ -42,7 +42,7 @@ export default function Checkout() {
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/payment/initiate`, {
+      const res = await fetch(`https://allo-tracteur-backend.onrender.com/api/payment/initiate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
