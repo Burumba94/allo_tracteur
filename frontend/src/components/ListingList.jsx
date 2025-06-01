@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { API_BASE_URL } from '../config';
 
 const ListingList = () => {
   const [listings, setListings] = useState([]);
@@ -9,7 +10,7 @@ const ListingList = () => {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await fetch('/api/listings/query');
+        const response = await fetch(`${API_BASE_URL}/api/listings/query`);
         if (!response.ok) throw new Error(`Erreur ${response.status}`);
         const data = await response.json();
         setListings(data.data.data || []);
