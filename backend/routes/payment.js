@@ -10,6 +10,7 @@ const setup = new paydunya.Setup({
   privateKey: process.env.PAYDUNYA_PRIVATE_KEY,
   publicKey: process.env.PAYDUNYA_PUBLIC_KEY,
   token: process.env.PAYDUNYA_TOKEN,
+  mode: "test"
 });
 
 const store = new paydunya.Store({
@@ -46,7 +47,7 @@ router.post('/initiate', async (req, res) => {
 
     invoice.totalAmount = unitPrice;
 
-    invoice.setCustomData({
+    invoice.addCustomData({
       reservationId,
       clientSource: 'AlloTracteurApp',
     });
