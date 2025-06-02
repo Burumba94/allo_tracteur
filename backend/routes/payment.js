@@ -51,10 +51,9 @@ router.post('/initiate', async (req, res) => {
     invoice.addCustomData("clientSource", "AlloTracteurApp");
 
 
-    invoice.setTaxes({
-      VAT: 0,
-      SERVICE: 0,
-    });
+    invoice.addTax('TVA (18%)', 6300);
+    invoice.addTax('Livraison', 1000);
+
 
     invoice.callbackURL = process.env.PAYDUNYA_IPN_URL;
     invoice.returnURL = process.env.PAYDUNYA_RETURN_URL;
