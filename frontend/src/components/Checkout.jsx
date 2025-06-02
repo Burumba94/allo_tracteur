@@ -42,7 +42,7 @@ export default function Checkout() {
     }
 
     try {
-      const res = await fetch(`https://allo-tracteur.onrender.com/api/payment/initiate`, {
+      const res = await fetch(`${process.env.API_URL/api/payment/initiate}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
