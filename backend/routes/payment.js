@@ -47,10 +47,9 @@ router.post('/initiate', async (req, res) => {
 
     invoice.totalAmount = unitPrice;
 
-    invoice.addCustomData({
-      reservationId,
-      clientSource: 'AlloTracteurApp',
-    });
+    invoice.addCustomData("reservationId", reservationId);
+    invoice.addCustomData("clientSource", "AlloTracteurApp");
+
 
     invoice.setTaxes({
       VAT: 0,
