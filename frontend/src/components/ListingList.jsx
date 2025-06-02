@@ -6,12 +6,12 @@ const ListingList = () => {
   const [included, setIncluded] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await fetch(`${process.env.API_URL}/api/listings/query`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/listings/query`);
         if (!response.ok) throw new Error(`Erreur ${response.status}`);
+        console.log("🚀 ~ fetchListings ~ response:", response)
         const data = await response.json();
         setListings(data.data.data || []);
         setIncluded(data.data.included || []);

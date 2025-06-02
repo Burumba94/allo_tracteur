@@ -12,7 +12,7 @@ export default function PaymentSuccess() {
     useEffect(() => {
         const confirmReservation = async () => {
             try {
-                const response = await fetch(`${process.env.API_URL}/api/payment/success`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/success`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ reservationId })
