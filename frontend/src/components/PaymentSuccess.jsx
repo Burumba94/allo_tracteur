@@ -12,7 +12,7 @@ export default function PaymentSuccess() {
     useEffect(() => {
         const confirmReservation = async () => {
             try {
-                const response = await fetch(`https://allo-tracteur-backend.onrender.com/api/payment/success`, {
+                const response = await fetch(`https://allo-tracteur.onrender.com/api/payment/success`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ reservationId })
