@@ -12,8 +12,8 @@ function App() {
         </header>
         <main className="w-full max-w-4xl px-4">
           <Routes>
-            <Route path="/" element={<ListingList />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/" element={<ListingList />} />
             <Route path="/success" element={<PaymentSuccess />} />
           </Routes>
         </main>
