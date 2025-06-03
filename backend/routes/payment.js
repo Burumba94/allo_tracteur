@@ -1,10 +1,11 @@
 // routes/payment.js
 import express from 'express';
 import paydunya from 'paydunya';
+//import axios from 'axios';
 
 const router = express.Router();
 
-// Configuration PayDunya
+//Configuration PayDunya
 const setup = new paydunya.Setup({
   masterKey: process.env.PAYDUNYA_MASTER_KEY,
   privateKey: process.env.PAYDUNYA_PRIVATE_KEY,
@@ -27,7 +28,74 @@ router.post('/initiate', async (req, res) => {
   console.log(' Requête paiement reçue :', req.body);
   const { amount, reservationId } = req.body;
   
+/* const totalAmount = parseInt(amount, 10);
+  
+  if (totalAmount || isNaN(totalAmount) || totalAmount <= 0 || totalAmount > 3000000) {
+    return res.status(400).JSON({ error: 'Montant invalide ou trop élevé' });
+  }
+  if (!reservationId) {
+    return res.status(400).json({ error: 'ID reservation manquant '});
+  }
 
+  const invoicePayload = {
+    invoice: {
+      items: [
+        {
+          name: 'Location de tracteur',
+          quantity: 1,
+          unit_price: totalAmount,
+          total_price: totalAmount,
+          description: `Réservation Sharetribe ID ${reservationId}`,
+        },
+      ],
+      totalAmount: totalAmount,
+      description: `Réservation Allô Tracteur #${reservationId}`,
+      return_url: process.env.PAYDUNYA_RETURN_URL,
+      cancel_url: process.env.PAYDUNYA_CANCEL_URL,
+      callback_url: process.env.PAYDUNYA_IPN_URL,
+      customer: {
+        email: 'client@example.com',
+        fullname: 'Client Allô tracteur',
+        phone: '771234567'
+      }
+    },
+    store: {
+      name: 'ALLô Tracteur',
+      tagline: 'Location de matériel agricole',
+      phone: '221781244497',
+      postal_address: 'Dakar, Sénégal'
+    } 
+  };
+
+  try {
+    const response = await axios.post(
+      'https://app.paydunya.com/sandbox-api/v1/checkout-invoice/create',
+      invoicePayload,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'PAYDUNYA-MASTER-KEY': process.env.PAYDUNYA_MASTER_KEY,
+          'PAYDUNYA-PRIVATE-KEY': process.env.PAYDUNYA_PRIVATE_KEY,
+          'PAYDUNYA-PUBLIC-KEY': process.env.PAYDUNYA_PUBLIC_KEY,
+          'PAYDUNYA-TOKEN': process.env.PAYDUNYA_TOKEN,
+        },
+      }
+    );
+
+    if (response.data.response_code === '00') {
+      console.log('Facture PAYDUNYA créée: ', response.data.invoice_url);
+      return res.status(200).json({ redirect_url: response.data.invoice_url });
+    } else {
+      console.error('Erreur Paydunya:', response.data);
+      return res.status(400).json({ error: response.data.response_text || 'Erreur création de facture.' });
+    }
+  } catch (err) {
+    console.error('Exception Paydunya:', err);
+    return res.status(500).json({ error: 'Erreur lors de la création de facture Paydunya.' });
+  }
+});
+
+export default router; */
   try {
     const unitPrice = parseInt(amount);
 
@@ -77,4 +145,4 @@ router.post('/initiate', async (req, res) => {
   }
 });
 
-export default router;
+export default router; 
