@@ -18,6 +18,7 @@
     "express": "^5.1.0",
     "formidable": "^3.5.4",
     "paydunya": "^1.0.12",
+    "paytech-node-ts-sdk": "^1.0.5",
     "serverless-http": "^3.2.0",
     "sharetribe-flex-integration-sdk": "^1.11.0"
   }
